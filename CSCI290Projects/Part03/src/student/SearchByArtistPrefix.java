@@ -51,6 +51,10 @@ public class SearchByArtistPrefix {
         ArrayList<Song> tempResults = new ArrayList<Song>();
         Song tempSong = new Song(artistPrefix, "", "");
         int location = -Arrays.binarySearch(songs, tempSong, cmp);
+        if (location < 0)
+        {
+            location = -location;
+        }
         System.out.println("Index from binary search is " + -location);
         int binarySearchComparisons = cmp.getCmpCnt();
         System.out.println("Binary search comparisons: " + binarySearchComparisons);
