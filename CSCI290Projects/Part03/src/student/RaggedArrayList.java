@@ -196,12 +196,15 @@ public class RaggedArrayList<E> implements Iterable<E> {
  */ 
 public ListLoc findFront(E item) {
     int l1 = 0;
-
+    if (l1NumUsed == 0 || ((L2Array) l1Array[l1]).numUsed == 0)
+    {
+        return new ListLoc(0,0);
+    }
     // First loop: Find the L2Array that may contain the element
-    while (l1 < l1NumUsed && l1Array[l1] != null && comp.compare(((L2Array) l1Array[l1]).items[0], item) < 0) {
+    while (l1 < l1NumUsed && l1Array[l1] != null && comp.compare(((L2Array) l1Array[l1]).items[((L2Array) l1Array[l1]).numUsed-1], item) < 0) {
         l1++;
     }
-    l1--;
+    if (l1Array[l1] == null) {l1--; }
     // If at an empty or larger L1 array, item should go in the first position
     if (l1 == l1NumUsed || comp.compare(((L2Array) l1Array[l1]).items[0], item) > 0) {
         return new ListLoc(l1, 0); // Insert at the start of this L2Array
@@ -218,13 +221,17 @@ public ListLoc findFront(E item) {
 }
 
 public ListLoc findEnd(E item) {
-    int l1 = 0;
+    int l1 = l1NumUsed - 1;
+    if (l1 == -1 || ((L2Array) l1Array[l1]).numUsed == 0)
+    {
+        return new ListLoc(0,0);
+    }
 
     // First loop: Find the L2Array that may contain the element
-    while (l1 < l1NumUsed && l1Array[l1] != null && comp.compare(((L2Array) l1Array[l1]).items[0], item) < 0) {
-        l1++;
+    while (l1 > 0 && l1Array[l1] != null && comp.compare(((L2Array) l1Array[l1]).items[0], item) > 0) {
+        l1--;
     }
-    l1--;
+//    if (l1Array[l1] == null) {l1--; }
     // If at an empty or larger L1 array, item should go in the first position
     if (l1 == l1NumUsed || comp.compare(((L2Array) l1Array[l1]).items[0], item) > 0) {
         return new ListLoc(l1, 0); // Insert at the start of this L2Array
@@ -236,6 +243,7 @@ public ListLoc findEnd(E item) {
     while (l2 >= 0 && comp.compare(l2Array.items[l2], item) > 0) {
         l2--;
     }
+    l2++;
 
     return new ListLoc(l1, l2); // Return the location of the item
 
