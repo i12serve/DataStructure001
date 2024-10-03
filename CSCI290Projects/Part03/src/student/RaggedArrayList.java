@@ -186,125 +186,59 @@ public class RaggedArrayList<E> implements Iterable<E> {
         }
     }
         /**
+ /**
  * Finds the location of the specified item in the Ragged ArrayList.
  * If the item exists, returns the location of the first occurrence.
  * If the item does not exist, returns the location where it should be inserted.
  *
  * @param item The item to search for.
  * @return A ListLoc representing the item's location or the insertion point.
- */
+ */ 
 public ListLoc findFront(E item) {
-    // Loop through the L1Array (outer array)
-    for (int l1 = 0; l1 < l1Array.length; l1++) {
-        // Cast the current L2Array from the L1Array
-        L2Array l2Array = (L2Array) l1Array[l1];
+    int l1 = 0;
 
-        // Loop through the L2Array (inner array)
-        for (int l2 = 0; l2 < l2Array.numUsed; l2++) {
-            E currentElement = (E) l2Array.items[l2]; // Cast the element to type E
-
-            // If the current element matches the item, return its location
-            if (currentElement.equals(item)) {
-                return new ListLoc(l1, l2);
-            }
-
-            // If the current element is greater than the item, return where it should be inserted
-            if (((Comparable<E>) currentElement).compareTo(item) > 0) {
-                return new ListLoc(l1, l2); // Insert before this element
-            }
-        }
-
-        // If we finished the L2Array without finding the item, it could be inserted at the end
-        if (l2Array.numUsed == 0 || ((Comparable<E>) l2Array.items[l2Array.numUsed - 1]).compareTo(item) < 0) {
-            return new ListLoc(l1, l2Array.numUsed); // Insert after the last element
-        }
+    // First loop: Find the L2Array that may contain the element
+    while (l1 < l1NumUsed && l1Array[l1] != null && comp.compare(((L2Array) l1Array[l1]).items[0], item) < 0) {
+        l1++;
     }
 
-    // If we finish all L1Array elements, insert at the end of the last L2Array
-    return new ListLoc(l1Array.length - 1, ((L2Array) l1Array[l1Array.length - 1]).numUsed);
+    // If at an empty or larger L1 array, item should go in the first position
+    if (l1 == l1NumUsed || comp.compare(((L2Array) l1Array[l1]).items[0], item) > 0) {
+        return new ListLoc(l1, 0); // Insert at the start of this L2Array
     }
 
-    /**
- * Finds the location immediately after the last matching occurrence of the specified item.
- * If the item does not exist, returns the location where it should be inserted.
- *
- * @param item The item to search for.
- * @return A ListLoc representing the insertion point after the last match or the insertion point for the new item.
- */
-public ListLoc findEnd(E item) {
-    ListLoc lastMatch = null; // This will store the last match location
-
-    // Loop through the L1Array (outer array)
-    for (int l1 = 0; l1 < l1Array.length; l1++) {
-        // Cast the current L2Array from the L1Array
-        L2Array l2Array = (L2Array) l1Array[l1];
-
-        // Loop through the L2Array (inner array)
-        for (int l2 = 0; l2 < l2Array.numUsed; l2++) {
-            E currentElement = (E) l2Array.items[l2]; // Cast the element to type E
-
-            // If the current element matches the item, update lastMatch
-            if (currentElement.equals(item)) {
-                lastMatch = new ListLoc(l1, l2 + 1); // Move to the next location after the match
-            }
-
-            // If the current element is greater than the item, return the current location (insertion point)
-            if (((Comparable<E>) currentElement).compareTo(item) > 0) {
-                // If no matches were found, insert here
-                return lastMatch != null ? lastMatch : new ListLoc(l1, l2);
-            }
-        }
-
-        // If we finished the L2Array without finding the item, it could be inserted at the end
-        if (l2Array.numUsed == 0 || ((Comparable<E>) l2Array.items[l2Array.numUsed - 1]).compareTo(item) < 0) {
-            return lastMatch != null ? lastMatch : new ListLoc(l1, l2Array.numUsed); // Insert after the last element
-        }
+    // Second loop: Traverse through the L2Array to find the exact position
+    L2Array l2Array = (L2Array) l1Array[l1];
+    int l2 = 0;
+    while (l2 < l2Array.numUsed && comp.compare(l2Array.items[l2], item) < 0) {
+        l2++;
     }
 
-    // If we finish all L1Array elements and found no matches, insert at the end of the last L2Array
-    return lastMatch != null ? lastMatch : new ListLoc(l1Array.length - 1, ((L2Array) l1Array[l1Array.length - 1]).numUsed);
+    return new ListLoc(l1, l2); // Return the location where it should be inserted
 }
 
-    /**
-     * add object after any other matching values findEnd will give the
-     * insertion position
-     *
-     * @param item the thing we are searching for a place to put.
-     * @return
-     */
-    public boolean add(E item) {
-        // TO DO in part 4 and NOT BEFORE
+public ListLoc findEnd(E item) {
+    int l1 = 0;
+    ListLoc lastMatch = null;
 
-        return true;
+    // First loop: Find the L2Array that may contain the element
+    while (l1 < l1NumUsed && l1Array[l1] != null && comp.compare(((L2Array) l1Array[l1]).items[0], item) <= 0) {
+        L2Array l2Array = (L2Array) l1Array[l1];
+
+        // Second loop: Traverse through the L2Array to find the last matching location
+        int l2 = 0;
+        while (l2 < l2Array.numUsed && comp.compare(l2Array.items[l2], item) <= 0) {
+            if (comp.compare(l2Array.items[l2], item) == 0) {
+                lastMatch = new ListLoc(l1, l2 + 1); // Update to the next spot after the match
+            }
+            l2++;
+        }
+        l1++;
     }
 
-    /**
-     * check if list contains a match
-     *
-     * @param item the thing we are looking for.
-     * @return true if the item is already in the data structure
-     */
-    public boolean contains(E item) {
-        // TO DO in part 5 and NOT BEFORE
-
-        return false;
-    }
-
-    /**
-     * copy the contents of the RaggedArrayList into the given array
-     *
-     * @param a - an array of the actual type and of the correct size
-     * @return the filled in array
-     */
-    public E[] toArray(E[] a) {
-        // TO DO in part 5 and NOT BEFORE
-
-        return a;
-    }
-
-    /**
-     * returns a new independent RaggedArrayList whose elements range from
-     * fromElemnt, inclusive, to toElement, exclusive. The original list is
+    return lastMatch != null ? lastMatch : new ListLoc(l1 - 1, ((L2Array) l1Array[l1 - 1]).numUsed);
+}
+     /** siginal list is
      * unaffected findStart and findEnd will be useful here
      *
      * @param fromElement the starting element
