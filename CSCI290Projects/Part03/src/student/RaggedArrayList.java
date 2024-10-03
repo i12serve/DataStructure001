@@ -213,7 +213,6 @@ public ListLoc findFront(E item) {
     while (l2 < l2Array.numUsed && comp.compare(l2Array.items[l2], item) < 0) {
         l2++;
     }
-    l2--;
 
     return new ListLoc(l1, l2); // Return the location of the item
 }
