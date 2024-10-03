@@ -48,40 +48,48 @@ public class SearchByArtistPrefix {
      *    the prefix
      */
     public Song[] search(String artistPrefix) {
-        ArrayList<Song> tempResults = new ArrayList<Song>();
-        Song tempSong = new Song(artistPrefix, "", "");
-        int location = -Arrays.binarySearch(songs, tempSong, cmp);
-        System.out.println("Index from binary search is " + -location);
-        int binarySearchComparisons = cmp.getCmpCnt();
-        System.out.println("Binary search comparisons: " + binarySearchComparisons);
-        int curIndex = location;
-        while (songs[curIndex].getArtist().toLowerCase().startsWith(artistPrefix.toLowerCase()) && cmp.compare(songs[curIndex], songs[curIndex]) == 0)
-        {
-            tempResults.add(songs[curIndex]);
-            curIndex--;
-        }
-        System.out.println("Front found at " + (curIndex + 1));
-        
-        curIndex = location + 1;
-        while (songs[curIndex].getArtist().toLowerCase().startsWith(artistPrefix.toLowerCase()) && cmp.compare(songs[curIndex], songs[curIndex]) == 0)
-        {
-            tempResults.add(songs[curIndex]);
-            curIndex++;
-        }
-        
-        Song[] results;
-        results = tempResults.toArray(Song[]::new);
-        int listComparisons = cmp.getCmpCnt() - binarySearchComparisons;
-        System.out.println("Comparisons to build the list: " + listComparisons);
-        int actualComplexity = cmp.getCmpCnt();
-        System.out.println("Actual complexity is: " + actualComplexity);
-        int k = results.length;
-        System.out.println("k: " + results.length);
-        int logN = (int) (Math.log(songs.length) / Math.log(2));
-        System.out.println("Log n: " + logN);
-        System.out.println("Theoretical complexity: " + (logN + k));
-        return results;
+    ArrayList<Song> tempResults = new ArrayList<Song>();
+    Song tempSong = new Song(artistPrefix, "", "");
+    int location = Arrays.binarySearch(songs, tempSong, cmp);
+
+    // Handle case where binary search returns a negative index
+    if (location < 0) {
+        location = -location - 1; // Convert to insertion point
     }
+
+    System.out.println("Index from binary search is " + location);
+    int binarySearchComparisons = cmp.getCmpCnt();
+    System.out.println("Binary search comparisons: " + binarySearchComparisons);
+
+    // Search for songs before the location (front)
+    int curIndex = location - 1;
+    while (curIndex >= 0 && songs[curIndex].getArtist().toLowerCase().startsWith(artistPrefix.toLowerCase())) {
+        tempResults.add(0, songs[curIndex]); // Add to front of the list
+        curIndex--;
+    }
+    System.out.println("Front found at " + (curIndex + 1));
+
+    // Search for songs after the location (end)
+    curIndex = location;
+    while (curIndex < songs.length && songs[curIndex].getArtist().toLowerCase().startsWith(artistPrefix.toLowerCase())) {
+        tempResults.add(songs[curIndex]); // Add to the end of the list
+        curIndex++;
+    }
+
+    Song[] results = tempResults.toArray(Song[]::new);
+    int listComparisons = cmp.getCmpCnt() - binarySearchComparisons;
+    System.out.println("Comparisons to build the list: " + listComparisons);
+    int actualComplexity = cmp.getCmpCnt();
+    System.out.println("Actual complexity is: " + actualComplexity);
+    int k = results.length;
+    System.out.println("k: " + results.length);
+    int logN = (int) (Math.log(songs.length) / Math.log(2));
+    System.out.println("Log n: " + logN);
+    System.out.println("Theoretical complexity: " + (logN + k));
+
+    return results;
+}
+
 
     /**
      * testing method for this unit
