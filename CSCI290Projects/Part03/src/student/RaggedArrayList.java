@@ -201,7 +201,7 @@ public ListLoc findFront(E item) {
     while (l1 < l1NumUsed && l1Array[l1] != null && comp.compare(((L2Array) l1Array[l1]).items[0], item) < 0) {
         l1++;
     }
-
+    l1--;
     // If at an empty or larger L1 array, item should go in the first position
     if (l1 == l1NumUsed || comp.compare(((L2Array) l1Array[l1]).items[0], item) > 0) {
         return new ListLoc(l1, 0); // Insert at the start of this L2Array
@@ -213,30 +213,34 @@ public ListLoc findFront(E item) {
     while (l2 < l2Array.numUsed && comp.compare(l2Array.items[l2], item) < 0) {
         l2++;
     }
+    l2--;
 
-    return new ListLoc(l1, l2); // Return the location where it should be inserted
+    return new ListLoc(l1, l2); // Return the location of the item
 }
 
 public ListLoc findEnd(E item) {
     int l1 = 0;
-    ListLoc lastMatch = null;
 
     // First loop: Find the L2Array that may contain the element
-    while (l1 < l1NumUsed && l1Array[l1] != null && comp.compare(((L2Array) l1Array[l1]).items[0], item) <= 0) {
-        L2Array l2Array = (L2Array) l1Array[l1];
-
-        // Second loop: Traverse through the L2Array to find the last matching location
-        int l2 = 0;
-        while (l2 < l2Array.numUsed && comp.compare(l2Array.items[l2], item) <= 0) {
-            if (comp.compare(l2Array.items[l2], item) == 0) {
-                lastMatch = new ListLoc(l1, l2 + 1); // Update to the next spot after the match
-            }
-            l2++;
-        }
+    while (l1 < l1NumUsed && l1Array[l1] != null && comp.compare(((L2Array) l1Array[l1]).items[0], item) < 0) {
         l1++;
     }
+    l1--;
+    // If at an empty or larger L1 array, item should go in the first position
+    if (l1 == l1NumUsed || comp.compare(((L2Array) l1Array[l1]).items[0], item) > 0) {
+        return new ListLoc(l1, 0); // Insert at the start of this L2Array
+    }
 
-    return lastMatch != null ? lastMatch : new ListLoc(l1 - 1, ((L2Array) l1Array[l1 - 1]).numUsed);
+    // Second loop: Traverse through the L2Array backwards to find the exact position
+    L2Array l2Array = (L2Array) l1Array[l1];
+    int l2 = l2Array.numUsed - 1;
+    while (l2 >= 0 && comp.compare(l2Array.items[l2], item) > 0) {
+        l2--;
+    }
+
+    return new ListLoc(l1, l2); // Return the location of the item
+
+    
 }
      /** siginal list is
      * unaffected findStart and findEnd will be useful here
