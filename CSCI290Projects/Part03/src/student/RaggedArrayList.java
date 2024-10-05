@@ -231,8 +231,7 @@ public ListLoc findEnd(E item) {
     while (l1 > 0 && l1Array[l1] != null && comp.compare(((L2Array) l1Array[l1]).items[0], item) > 0) {
         l1--;
     }
-//    if (l1Array[l1] == null) {l1--; }
-    // If at an empty or larger L1 array, item should go in the first position
+    // If all elements of the l2 array should go after the item, return the 0 index of the l2 array
     if (l1 == l1NumUsed || comp.compare(((L2Array) l1Array[l1]).items[0], item) > 0) {
         return new ListLoc(l1, 0); // Insert at the start of this L2Array
     }
