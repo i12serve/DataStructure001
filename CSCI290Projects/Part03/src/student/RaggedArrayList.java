@@ -1,10 +1,10 @@
-/**  
+/**
  * File: RaggedArrayList.java
  * ****************************************************************************
  *                           Revision History
  * ****************************************************************************
- * 
- * 8/2015 - Anne Applin - Added formatting and JavaDoc 
+ *
+ * 8/2015 - Anne Applin - Added formatting and JavaDoc
  * 2015 - Bob Boothe - starting code
  * ****************************************************************************
  */
@@ -20,7 +20,7 @@ import java.util.Random;
 import java.util.Scanner;
 
 /**
- * * 
+ * *
  * The RaggedArrayList is a 2 level data structure that is an array of arrays.
  *
  * It keeps the items in sorted order according to the comparator. Duplicates
@@ -28,15 +28,15 @@ import java.util.Scanner;
  *
  * NOTE: normally fields, internal nested classes and non API methods should all
  * be private, however they have been made public so that the tester code can
- * set them 
+ * set them
+ *
  * @author Bob Booth
- * @param <E>  A generic data type so that this structure can be built with any
+ * @param <E> A generic data type so that this structure can be built with any
  * data type (object)
  */
 public class RaggedArrayList<E> implements Iterable<E> {
 
     // must be even so when split get two equal pieces
-
     private static final int MINIMUM_SIZE = 4;
     /**
      * The total number of elements in the entire RaggedArrayList
@@ -73,9 +73,8 @@ public class RaggedArrayList<E> implements Iterable<E> {
 
     /**
      * ***********************************************************
-     * nested class for 2nd level arrays 
-     * read and understand it.
-     * (DONE - do not change)
+     * nested class for 2nd level arrays read and understand it. (DONE - do not
+     * change)
      */
     public class L2Array {
 
@@ -100,12 +99,10 @@ public class RaggedArrayList<E> implements Iterable<E> {
         }
     }// end of nested class L2Array
 
-   
     // ***********************************************************
-    
     /**
-     * total size (number of entries) in the entire data structure 
-     * (DONE - do not change)
+     * total size (number of entries) in the entire data structure (DONE - do
+     * not change)
      *
      * @return total size of the data structure
      */
@@ -115,8 +112,7 @@ public class RaggedArrayList<E> implements Iterable<E> {
 
     /**
      * null out all references so garbage collector can grab them but keep
-     * otherwise empty l1Array and 1st L2Array 
-     * (DONE - Do not change)
+     * otherwise empty l1Array and 1st L2Array (DONE - Do not change)
      */
     public void clear() {
         size = 0;
@@ -131,8 +127,8 @@ public class RaggedArrayList<E> implements Iterable<E> {
 
     /**
      * *********************************************************
-     * nested class for a list position used only internally 2 parts: 
-     * level 1 index and level 2 index
+     * nested class for a list position used only internally 2 parts: level 1
+     * index and level 2 index
      */
     public class ListLoc {
 
@@ -158,8 +154,8 @@ public class RaggedArrayList<E> implements Iterable<E> {
         }
 
         /**
-         * test if two ListLoc's are to the same location 
-         * (done -- do not change)
+         * test if two ListLoc's are to the same location (done -- do not
+         * change)
          *
          * @param otherObj the other listLoc
          * @return true if they are the same location and false otherwise
@@ -185,71 +181,73 @@ public class RaggedArrayList<E> implements Iterable<E> {
             // TO DO IN PART 5 and NOT BEFORE
         }
     }
-        /**
- /**
- * Finds the location of the specified item in the Ragged ArrayList.
- * If the item exists, returns the location of the first occurrence.
- * If the item does not exist, returns the location where it should be inserted.
- *
- * @param item The item to search for.
- * @return A ListLoc representing the item's location or the insertion point.
- */ 
-public ListLoc findFront(E item) {
-    int l1 = 0;
-    if (l1NumUsed == 0 || ((L2Array) l1Array[l1]).numUsed == 0)
-    {
-        return new ListLoc(0,0);
-    }
-    // First loop: Find the L2Array that may contain the element
-    while (l1 < l1NumUsed && l1Array[l1] != null && comp.compare(((L2Array) l1Array[l1]).items[((L2Array) l1Array[l1]).numUsed-1], item) < 0) {
-        l1++;
-    }
-    if (l1Array[l1] == null) {l1--; }
-    // If at an empty or larger L1 array, item should go in the first position
-    if (l1 == l1NumUsed || comp.compare(((L2Array) l1Array[l1]).items[0], item) > 0) {
-        return new ListLoc(l1, 0); // Insert at the start of this L2Array
+
+    /**
+     * /**
+     * Finds the location of the specified item in the Ragged ArrayList. If the
+     * item exists, returns the location of the first occurrence. If the item
+     * does not exist, returns the location where it should be inserted.
+     *
+     * @param item The item to search for.
+     * @return A ListLoc representing the item's location or the insertion
+     * point.
+     */
+    public ListLoc findFront(E item) {
+        int l1 = 0;
+        if (l1NumUsed == 0 || ((L2Array) l1Array[l1]).numUsed == 0) {
+            return new ListLoc(0, 0);
+        }
+        // First loop: Find the L2Array that may contain the element
+        while (l1 < l1NumUsed && l1Array[l1] != null && comp.compare(((L2Array) l1Array[l1]).items[((L2Array) l1Array[l1]).numUsed - 1], item) < 0) {
+            l1++;
+        }
+        if (l1Array[l1] == null) {
+            l1--;
+        }
+        // If at an empty or larger L1 array, item should go in the first position
+        if (l1 == l1NumUsed || comp.compare(((L2Array) l1Array[l1]).items[0], item) > 0) {
+            return new ListLoc(l1, 0); // Insert at the start of this L2Array
+        }
+
+        // Second loop: Traverse through the L2Array to find the exact position
+        L2Array l2Array = (L2Array) l1Array[l1];
+        int l2 = 0;
+        while (l2 < l2Array.numUsed && comp.compare(l2Array.items[l2], item) < 0) {
+            l2++;
+        }
+
+        return new ListLoc(l1, l2); // Return the location of the item
     }
 
-    // Second loop: Traverse through the L2Array to find the exact position
-    L2Array l2Array = (L2Array) l1Array[l1];
-    int l2 = 0;
-    while (l2 < l2Array.numUsed && comp.compare(l2Array.items[l2], item) < 0) {
+    public ListLoc findEnd(E item) {
+        int l1 = l1NumUsed - 1;
+        if (l1 == -1 || ((L2Array) l1Array[l1]).numUsed == 0) {
+            return new ListLoc(0, 0);
+        }
+
+        // First loop: Find the L2Array that may contain the element
+        while (l1 > 0 && l1Array[l1] != null && comp.compare(((L2Array) l1Array[l1]).items[0], item) > 0) {
+            l1--;
+        }
+        // If all elements of the l2 array should go after the item, return the 0 index of the l2 array
+        if (l1 == l1NumUsed || comp.compare(((L2Array) l1Array[l1]).items[0], item) > 0) {
+            return new ListLoc(l1, 0); // Insert at the start of this L2Array
+        }
+
+        // Second loop: Traverse through the L2Array backwards to find the exact position
+        L2Array l2Array = (L2Array) l1Array[l1];
+        int l2 = l2Array.numUsed - 1;
+        while (l2 >= 0 && comp.compare(l2Array.items[l2], item) > 0) {
+            l2--;
+        }
         l2++;
+
+        return new ListLoc(l1, l2); // Return the location of the item
+
     }
 
-    return new ListLoc(l1, l2); // Return the location of the item
-}
-
-public ListLoc findEnd(E item) {
-    int l1 = l1NumUsed - 1;
-    if (l1 == -1 || ((L2Array) l1Array[l1]).numUsed == 0)
-    {
-        return new ListLoc(0,0);
-    }
-
-    // First loop: Find the L2Array that may contain the element
-    while (l1 > 0 && l1Array[l1] != null && comp.compare(((L2Array) l1Array[l1]).items[0], item) > 0) {
-        l1--;
-    }
-    // If all elements of the l2 array should go after the item, return the 0 index of the l2 array
-    if (l1 == l1NumUsed || comp.compare(((L2Array) l1Array[l1]).items[0], item) > 0) {
-        return new ListLoc(l1, 0); // Insert at the start of this L2Array
-    }
-
-    // Second loop: Traverse through the L2Array backwards to find the exact position
-    L2Array l2Array = (L2Array) l1Array[l1];
-    int l2 = l2Array.numUsed - 1;
-    while (l2 >= 0 && comp.compare(l2Array.items[l2], item) > 0) {
-        l2--;
-    }
-    l2++;
-
-    return new ListLoc(l1, l2); // Return the location of the item
-
-    
-}
-     /** siginal list is
-     * unaffected findStart and findEnd will be useful here
+    /**
+     * siginal list is unaffected findStart and findEnd will be useful here
      *
      * @param fromElement the starting element
      * @param toElement the element after the last element we actually want
@@ -263,8 +261,8 @@ public ListLoc findEnd(E item) {
     }
 
     /**
-     * returns an iterator for this list this method just creates an instance
-     * of the inner Itr() class (DONE)
+     * returns an iterator for this list this method just creates an instance of
+     * the inner Itr() class (DONE)
      *
      * @return an iterator
      */
@@ -298,10 +296,10 @@ public ListLoc findEnd(E item) {
         }
 
         /**
-         * return item and move to next throws NoSuchElementException if 
-         * off end of list.  An exception is thrown here because calling 
-         * next() without calling hasNext() shows a certain level or stupidity
-         * on the part of the programmer, so it can blow up. They deserve it.
+         * return item and move to next throws NoSuchElementException if off end
+         * of list. An exception is thrown here because calling next() without
+         * calling hasNext() shows a certain level or stupidity on the part of
+         * the programmer, so it can blow up. They deserve it.
          */
         public E next() {
             // TO DO in part 5 and NOT BEFORE
