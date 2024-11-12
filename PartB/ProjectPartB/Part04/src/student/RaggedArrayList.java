@@ -232,35 +232,6 @@ public class RaggedArrayList<E> implements Iterable<E> {
         public void moveToNext() {
             // TO DO IN PART 5 and NOT BEFORE
         }
-
-        private int getL1() {
-            throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
-        }
-
-        private int getL1() {
-            throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
-        }
-
-        private int getL2() {
-            throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
-        }
-public RaggedArrayList<E> subList(E fromElement, E toElement) {
-    RaggedArrayList<E> subList = new RaggedArrayList<>(); // New empty list
-
-    // Find the start and end positions
-    ListLoc startLoc = findFront(fromElement);
-    ListLoc endLoc = findFront(toElement);
-
-    // Traverse from startLoc to endLoc and add elements to subList
-    ListLoc currentLoc = new ListLoc(startLoc.getL1(), startLoc.getL2());
-    while (!currentLoc.equals(endLoc)) {
-        L2Array l2Array = (L2Array) l1Array[currentLoc.getL1()];
-        subList.add(l2Array.items[currentLoc.getL2()]); // Add the element to subList
-        currentLoc.moveToNext(this); // Move to the next element
-    }
-
-    return subList; // Return the new sublist
-}
     }
         /**
  /**
@@ -295,99 +266,6 @@ public ListLoc findFront(E item) {
     }
 
     return new ListLoc(l1, l2); // Return the location of the item
-}
-public boolean contains(E item) {
-    ListLoc loc = findFront(item); // Get the location using findFront
-    int l1 = loc.getL1(); // The L1 index
-    int l2 = loc.getL2(); // The L2 index
-    
-    // Check if the location is within bounds and if the item matches
-    if (l1 < l1NumUsed) {
-        L2Array l2Array = (L2Array) l1Array[l1];
-        if (l2 < l2Array.numUsed && comp.compare(l2Array.items[l2], item) == 0) {
-            return true; // Item is found at the location
-        }
-    }
-    
-    return false; // Item is not found
-}
-public class ListLoc {
-    private int l1; // Current L1 index
-    private int l2; // Current L2 index
-
-    // Constructor, getters, and other methods
-
-    public void moveToNext(RaggedArrayList<E> ral) {
-        L2Array currentArray = (L2Array) ral.l1Array[l1];
-        
-        if (l2 + 1 < currentArray.numUsed) {
-            l2++; // Move to the next position in the current L2Array
-        } else {
-            l1++; // Move to the next L1 array
-            l2 = 0; // Reset l2 index to start of the new L2Array
-        }
-    }
-}
-private class Itr implements Iterator<E> {
-    private ListLoc current; // The iterator's current position
-
-    public Itr() {
-        current = new ListLoc(0, 0); // Start at the beginning
-    }
-
-    @Override
-    public boolean hasNext() {
-        return current.l1 < l1NumUsed; // Check if we're within bounds
-    }
-
-    @Override
-    public E next() {
-        if (!hasNext()) {
-            throw new NoSuchElementException(); // Throw exception if past end
-        }
-
-        L2Array l2Array = (L2Array) l1Array[current.l1];
-        E item = l2Array.items[current.l2]; // Get the current item
-        current.moveToNext(RaggedArrayList.this); // Move to the next position
-        return item;
-    }
-
-    @Override
-    public void remove() {
-        throw new UnsupportedOperationException("Remove not supported.");
-    }
-}
-public Iterator<E> iterator() {
-    return new Itr();
-}
-public E[] toArray(E[] a) {
-    if (a.length != size) {
-        throw new IllegalArgumentException("Array size must match list size.");
-    }
-
-    int index = 0;
-    for (E item : this) { // Using the iterator to traverse the list
-        a[index++] = item;
-    }
-    
-    return a;
-}
-public RaggedArrayList<E> subList(E fromElement, E toElement) {
-    RaggedArrayList<E> subList = new RaggedArrayList<>(); // New empty list
-
-    // Find the start and end positions
-    ListLoc startLoc = findFront(fromElement);
-    ListLoc endLoc = findFront(toElement);
-
-    // Traverse from startLoc to endLoc and add elements to subList
-    ListLoc currentLoc = new ListLoc(startLoc.getL1(), startLoc.getL2());
-    while (!currentLoc.equals(endLoc)) {
-        L2Array l2Array = (L2Array) l1Array[currentLoc.getL1()];
-        subList.add(l2Array.items[currentLoc.getL2()]); // Add the element to subList
-        currentLoc.moveToNext(this); // Move to the next element
-    }
-
-    return subList; // Return the new sublist
 }
 
 public ListLoc findEnd(E item) {
