@@ -303,10 +303,21 @@ public class RaggedArrayList<E> implements Iterable<E> {
      * @return the sublist
      */
     public RaggedArrayList<E> subList(E fromElement, E toElement) {
-        // TO DO in part 5 and NOT BEFORE
+        RaggedArrayList<E> subList = new RaggedArrayList<E>(comp); // New empty list
 
-        RaggedArrayList<E> result = new RaggedArrayList<E>(comp);
-        return result;
+        // Find the start and end positions
+        ListLoc startLoc = findFront(fromElement);
+        ListLoc endLoc = findFront(toElement);
+
+        // Traverse from startLoc to endLoc and add elements to subList
+        ListLoc currentLoc = new ListLoc(startLoc.l1, startLoc.l2);
+        while (!currentLoc.equals(endLoc)) {
+            L2Array l2Array = (L2Array) l1Array[currentLoc.l1];
+            subList.add(l2Array.items[currentLoc.l2]); // Add the element to subList
+            currentLoc.moveToNext(this); // Move to the next element
+        }
+
+        return subList; // Return the new sublist
     }
 
     /**
@@ -334,6 +345,7 @@ public class RaggedArrayList<E> implements Iterable<E> {
 
         return false; // Item is not found
     }
+
     public E[] toArray(E[] a) {
         if (a.length != size) {
             throw new IllegalArgumentException("Array size must match list size.");
@@ -346,6 +358,7 @@ public class RaggedArrayList<E> implements Iterable<E> {
 
         return a;
     }
+
     /**
      * Iterator is just a list loc. It starts at (0,0) and finishes with index2
      * 1 past the last item in the last block
