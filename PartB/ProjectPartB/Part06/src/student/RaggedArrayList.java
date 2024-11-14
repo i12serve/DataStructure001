@@ -71,6 +71,7 @@ public class RaggedArrayList<E> implements Iterable<E> {
         comp = c;
     }
 
+
     /**
      * ***********************************************************
      * nested class for 2nd level arrays read and understand it. (DONE - do not
@@ -101,10 +102,10 @@ public class RaggedArrayList<E> implements Iterable<E> {
 
     // ***********************************************************
     public boolean add(E newElement) {
-        size++;
+        this.size++;
         ListLoc addLocation = findEnd(newElement);
         L2Array addArray = (L2Array) (l1Array[addLocation.l1]);
-//        System.out.println(addLocation.l2 + " " + addArray.numUsed + " " + addLocation.l1);
+//        System.out.println(addLocation.level2Index + " " + addArray.numUsed + " " + addLocation.level1Index);
         if (addLocation.l2 <= addArray.numUsed) {
             System.arraycopy(addArray.items, addLocation.l2, addArray.items, addLocation.l2 + 1, addArray.numUsed - addLocation.l2);
         }
@@ -117,7 +118,6 @@ public class RaggedArrayList<E> implements Iterable<E> {
             // Double length of l2array if l2array < l1array
             if (addArray.numUsed < l1Array.length) {
                 L2Array newL2Array = new L2Array(addArray.items.length * 2);
-                System.out.printf("newL2Array Length: %d\naddArray Length: %d\n", newL2Array.items.length, addArray.items.length);
                 System.arraycopy(addArray.items, 0, newL2Array.items, 0, addArray.numUsed);
                 newL2Array.numUsed = addArray.numUsed;
                 l1Array[addLocation.l1] = newL2Array;
@@ -219,13 +219,14 @@ public class RaggedArrayList<E> implements Iterable<E> {
          * used to implement the iterator.
          */
         public void moveToNext(RaggedArrayList<E> ral) {
-            L2Array currentArray = (L2Array) ral.l1Array[l1];
+            L2Array currentArray = (L2Array) (ral.l1Array[l1]);
 
-            if (l2 + 1 < currentArray.numUsed) {
-                l2++; // Move to the next position in the current L2Array
-            } else {
-                l1++; // Move to the next L1 array
-                l2 = 0; // Reset l2 index to start of the new L2Array
+            l2++; // Move to next position
+
+            // If we're at the end of current L2 array, find next non-empty L2 array
+            if (l2 >= currentArray.numUsed) {
+                l1++;
+                l2 = 0;
             }
         }
     }
@@ -274,7 +275,7 @@ public class RaggedArrayList<E> implements Iterable<E> {
         }
 
         // First loop: Find the L2Array that may contain the element
-        while (l1 > 0 && l1Array[l1] != null && comp.compare(((L2Array) l1Array[l1]).items[0], item) > 0) {
+        while (l1 > 0 && l1Array[l1] != null && comp.compare(((L2Array) (l1Array[l1])).items[0], item) > 0) {
             l1--;
         }
 //    if (l1Array[l1] == null) {l1--; }
@@ -303,10 +304,21 @@ public class RaggedArrayList<E> implements Iterable<E> {
      * @return the sublist
      */
     public RaggedArrayList<E> subList(E fromElement, E toElement) {
-        // TO DO in part 5 and NOT BEFORE
+        RaggedArrayList<E> subList = new RaggedArrayList<E>(comp); // New empty list
 
-        RaggedArrayList<E> result = new RaggedArrayList<E>(comp);
-        return result;
+        // Find the start and end positions
+        ListLoc startLoc = findFront(fromElement);
+        ListLoc endLoc = findFront(toElement);
+
+        // Traverse from startLoc to endLoc and add elements to subList
+        ListLoc currentLoc = new ListLoc(startLoc.l1, startLoc.l2);
+        while (!currentLoc.equals(endLoc)) {
+            L2Array l2Array = (L2Array) l1Array[currentLoc.l1];
+            subList.add(l2Array.items[currentLoc.l2]); // Add the element to subList
+            currentLoc.moveToNext(this); // Move to the next element
+        }
+
+        return subList; // Return the new sublist
     }
 
     /**
@@ -320,6 +332,7 @@ public class RaggedArrayList<E> implements Iterable<E> {
     }
 
     public boolean contains(E item) {
+
         ListLoc loc = findFront(item); // Get the location using findFront
         int l1 = loc.l1; // The L1 index
         int l2 = loc.l2; // The L2 index
@@ -334,44 +347,86 @@ public class RaggedArrayList<E> implements Iterable<E> {
 
         return false; // Item is not found
     }
-    public E[] toArray(E[] a) {
+
+    public void toArray(E[] a) {
         if (a.length != size) {
             throw new IllegalArgumentException("Array size must match list size.");
         }
-
+        if (size == 0)
+        {
+            return;
+        }
         int index = 0;
         for (E item : this) { // Using the iterator to traverse the list
-            a[index++] = item;
+            a[index] = item;
+            index++;
         }
 
-        return a;
     }
+
+    
+    public void debugPrintAll() {
+        int count = 0;
+        for (int i = 0; i < l1NumUsed; i++) {
+            L2Array currentL2 = (L2Array) l1Array[i];
+            for (int j = 0; j < currentL2.numUsed; j++) {
+                count++;
+                System.out.printf("%s ", currentL2.items[j].toString());
+            }
+            System.out.println("");
+        }
+        System.out.printf("Total Number of Elements: %d\n", count);
+        System.out.printf("size Variable: %d\n", this.size());
+    }
+
     /**
      * Iterator is just a list loc. It starts at (0,0) and finishes with index2
      * 1 past the last item in the last block
      */
     private class Itr implements Iterator<E> {
 
-        private ListLoc current; // The iterator's current position
+        private ListLoc current;
 
         public Itr() {
-            current = new ListLoc(0, 0); // Start at the beginning
+            current = new ListLoc(0, 0);
         }
 
         @Override
         public boolean hasNext() {
-            return current.l1 < l1NumUsed; // Check if we're within bounds
+            // If we're beyond the last L1 array, no more elements
+            if (current.l1 >= l1NumUsed) {
+                return false;
+            }
+
+            L2Array currentArray = (L2Array) l1Array[current.l1];
+
+            // If we're within the current L2 array's used elements, we have more
+            if (current.l2 < currentArray.numUsed) {
+                return true;
+            }
+
+            // If we're at the end of current L2 array, check if there are more L1 arrays
+            int nextL1 = current.l1 + 1;
+            while (nextL1 < l1NumUsed) {
+                L2Array nextArray = (L2Array) l1Array[nextL1];
+                if (nextArray != null && nextArray.numUsed > 0) {
+                    return true;
+                }
+                nextL1++;
+            }
+
+            return false;
         }
 
         @Override
         public E next() {
             if (!hasNext()) {
-                throw new NoSuchElementException(); // Throw exception if past end
+                throw new NoSuchElementException();
             }
 
-            L2Array l2Array = (L2Array) l1Array[current.l2];
-            E item = l2Array.items[current.l2]; // Get the current item
-            current.moveToNext(RaggedArrayList.this); // Move to the next position
+            L2Array l2Array = (L2Array) l1Array[current.l1];
+            E item = l2Array.items[current.l2];
+            current.moveToNext(RaggedArrayList.this);
             return item;
         }
 

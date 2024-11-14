@@ -147,4 +147,12 @@ public class Song implements Comparable {
             return s1.getArtist().compareToIgnoreCase(s2.getArtist());
         }
     }
+    public static class CmpTitle extends CmpCnt implements Comparator<Song> {
+
+        @Override
+        public int compare(Song s1, Song s2) {
+            cmpCnt++;
+            return s1.getTitle().compareToIgnoreCase(s2.getTitle());
+        }
+    }
 }

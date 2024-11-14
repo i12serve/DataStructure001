@@ -117,7 +117,6 @@ public class RaggedArrayList<E> implements Iterable<E> {
             // Double length of l2array if l2array < l1array
             if (addArray.numUsed < l1Array.length) {
                 L2Array newL2Array = new L2Array(addArray.items.length * 2);
-                System.out.printf("newL2Array Length: %d\naddArray Length: %d\n", newL2Array.items.length, addArray.items.length);
                 System.arraycopy(addArray.items, 0, newL2Array.items, 0, addArray.numUsed);
                 newL2Array.numUsed = addArray.numUsed;
                 l1Array[addLocation.l1] = newL2Array;
