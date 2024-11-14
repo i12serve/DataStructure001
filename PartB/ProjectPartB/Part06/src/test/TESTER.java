@@ -19,16 +19,10 @@ public class TESTER {
         IntCmp cmp = new IntCmp();
         RaggedArrayList<Integer> ral;
         ral = new RaggedArrayList<Integer>(cmp);
-        for (int i = 0; i < 20; i+=2) {
+        for (int i = 0; i < 10514; i++) {
             ral.add(i);
-            System.out.println("");
         }
-        ral.debugPrintAll();
-        for (int i = 0; i < 20; i+=2) {
-            ral.add(i + 1);
-            System.out.println("");
-        }
-        ral.debugPrintAll();
+        ral.stats();
 
     }
 }
